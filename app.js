@@ -19,8 +19,8 @@ cells.forEach((cell, index) => {
 });
 
 // Handle cell click
-function handleCellClick(index) {
-    if (boardState[index] || !gameActive) // Cell taken or game inactive
+function handleCellClick(index, playerAction = true) {
+    if (boardState[index] || !gameActive || (playerAction && currentPlayer === 'O')) // Cell taken or game inactive
         return;
 
     boardState[index] = currentPlayer;
@@ -112,7 +112,8 @@ function bestMove() {
 
 // Computer makes a move
 function computerMove() {
-    handleCellClick(bestMove());
+    const move = bestMove();
+    handleCellClick(move, false);
 }
 
 // Reset game
