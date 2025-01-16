@@ -36,6 +36,10 @@ body {
     pointer-events: none;
 }
 
+.cell.winning {
+    background-color: #ff726f;
+}
+
 button {
     padding: 10px 20px;
     background-color: #007bff;

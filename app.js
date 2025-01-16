@@ -27,8 +27,10 @@ function handleCellClick(index, playerAction = true) {
     cells[index].textContent = currentPlayer;
     cells[index].classList.add('taken');
 
-    if (checkWin(currentPlayer)) {
-        alert(`${currentPlayer} wins`);
+    const winCombo = checkWin(currentPlayer);
+    if (winCombo) {
+        highlightWinningCells(winCombo);
+        alert(`${currentPlayer} wins!`);
         gameActive = false;
         return;
     }
@@ -46,11 +48,19 @@ function handleCellClick(index, playerAction = true) {
     }
 }
 
+// Highlight winning cells
+function highlightWinningCells(combo) {
+    combo.forEach(index => {
+        cells[index].classList.add('winning');
+    });
+}
+
 // Check for win
 function checkWin(player) {
-    return winningCombos.some(combo =>
+    const winCombo = winningCombos.find(combo =>
         combo.every(index => boardState[index] === player)
     );
+    return winCombo || null;
 }
 
 // Check if the board is full (draw)
@@ -121,7 +131,7 @@ resetButton.addEventListener('click', () => {
     boardState.fill(null);
     cells.forEach(cell => {
         cell.textContent = '';
-        cell.classList.remove('taken');
+        cell.classList.remove('taken', 'winning');
     });
     currentPlayer = 'X';
     gameActive = true;
