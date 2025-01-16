@@ -33,7 +33,7 @@ function handleCellClick(index) {
         return;
     }
 
-    if (boardState.every(cell => cell !== null)) { // Every cell taken, but no one wins
+    if (isBoardFull()) { // Every cell taken, but no one wins
         alert('It\'s a draw!');
         gameActive = false;
         return;
@@ -53,14 +53,66 @@ function checkWin(player) {
     );
 }
 
+// Check if the board is full (draw)
+function isBoardFull() {
+    return boardState.every(cell => cell !== null);
+}
+
+// Get a list of available moves
+function availableMoves() {
+    return boardState
+    .map((value, index) => (value === null? index : null))
+    .filter(index => index !== null);
+}
+
+// Minimax algorithm for player O (minimizing player)
+function minimax(is_maximizing) {
+    // Base case: check for terminal state
+    if (checkWin('O')) return -1; // O wins
+    if (checkWin('X')) return 1; // X wins
+    if (isBoardFull()) return 0; // Draw
+
+    let emptyCells = availableMoves();
+    if (is_maximizing) {
+        let best_value = Number.NEGATIVE_INFINITY;
+        emptyCells.forEach((cell) => {
+            boardState[cell] = 'X';
+            best_value = Math.max(best_value, minimax(false));
+            boardState[cell] = null;
+        });
+        return best_value;
+    }
+    else {
+        let best_value = Number.POSITIVE_INFINITY;
+        emptyCells.forEach((cell) => {
+            boardState[cell] = 'O';
+            best_value = Math.min(best_value, minimax(true));
+            boardState[cell] = null;
+        });
+        return best_value;
+    }
+}
+
+// Find the best move for player O (computer) using minimax
+function bestMove() {
+    let best_value = Number.POSITIVE_INFINITY;
+    let best_move = null;
+    let emptyCells = availableMoves();
+    emptyCells.forEach((cell) => {
+        boardState[cell] = 'O';
+        let move_value = minimax(true);
+        boardState[cell] = null;
+        if (move_value < best_value) {
+            best_value = move_value;
+            best_move = cell;
+        }
+    });
+    return best_move;
+}
+
 // Computer makes a move
 function computerMove() {
-    let emptyCells = boardState
-        .map((value, index) => (value === null? index : null))
-        .filter(index => index !== null);
-    
-    const randomIndex = emptyCells[Math.floor(Math.random()*emptyCells.length)];
-    handleCellClick(randomIndex);
+    handleCellClick(bestMove());
 }
 
 // Reset game
